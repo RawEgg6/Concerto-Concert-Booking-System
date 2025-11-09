@@ -1,0 +1,693 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    Review Artist Application
+{% endblock %}
+
+{% block content %}
+<style>
+    .review-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        padding: 2rem 1rem;
+    }
+
+    .review-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    /* Back Button */
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .back-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(-4px);
+    }
+
+    /* Review Card */
+    .review-card {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Header */
+    .review-header {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        padding: 2.5rem 2.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .review-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .review-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .artist-avatar-large {
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .artist-name-large {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.5rem;
+    }
+
+    .artist-genre-large {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 1.25rem;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .status-badge-large {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .status-badge-large.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-badge-large.approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge-large.rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* Content */
+    .review-content {
+        padding: 2.5rem;
+    }
+
+    .section {
+        margin-bottom: 2.5rem;
+    }
+
+    .section:last-child {
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title::before {
+        content: '';
+        width: 4px;
+        height: 20px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border-radius: 2px;
+    }
+
+    /* Info Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        background: #f8fafc;
+        padding: 1.25rem;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+    }
+
+    .info-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #1e293b;
+        word-break: break-word;
+    }
+
+    /* Bio Section */
+    .bio-content {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        color: #475569;
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    /* Social Links */
+    .social-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .social-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1.25rem;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        text-decoration: none;
+        color: #475569;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .social-link:hover {
+        border-color: #6366f1;
+        background: white;
+        color: #6366f1;
+        transform: translateX(4px);
+    }
+
+    .social-icon {
+        font-size: 1.25rem;
+    }
+
+    .social-link.disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
+    /* Proof Section */
+    .proof-content {
+        background: #fffbeb;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid #fcd34d;
+        color: #78350f;
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    /* Rejection Reason */
+    .rejection-box {
+        background: #fee2e2;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid #fca5a5;
+        color: #991b1b;
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    .rejection-title {
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Action Buttons */
+    .action-section {
+        background: #f8fafc;
+        padding: 2rem 2.5rem;
+        border-top: 2px solid #e2e8f0;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        flex: 1;
+        min-width: 200px;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .approve-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .approve-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .reject-btn {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .reject-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .action-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    /* Rejection Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .modal.active {
+        display: flex;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 100%;
+        overflow: hidden;
+        animation: modalSlideUp 0.3s ease-out;
+    }
+
+    @keyframes modalSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        padding: 1.5rem 2rem;
+        color: white;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .modal-subtitle {
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-textarea {
+        width: 100%;
+        padding: 0.875rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        color: #1e293b;
+        resize: vertical;
+        min-height: 120px;
+        transition: all 0.2s ease;
+    }
+
+    .form-textarea:focus {
+        outline: none;
+        border-color: #ef4444;
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .modal-btn {
+        flex: 1;
+        padding: 0.875rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .modal-btn-cancel {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .modal-btn-cancel:hover {
+        background: #e2e8f0;
+    }
+
+    .modal-btn-confirm {
+        background: #ef4444;
+        color: white;
+    }
+
+    .modal-btn-confirm:hover {
+        background: #dc2626;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .review-wrapper {
+            padding: 1rem 0.5rem;
+        }
+
+        .review-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .artist-name-large {
+            font-size: 1.75rem;
+        }
+
+        .artist-avatar-large {
+            width: 80px;
+            height: 80px;
+            font-size: 2.5rem;
+        }
+
+        .review-content {
+            padding: 2rem 1.5rem;
+        }
+
+        .action-section {
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-btn {
+            min-width: 100%;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="review-wrapper">
+    <div class="review-container">
+        <!-- Back Button -->
+        <a href="/admin/dashboard" class="back-button">
+            ← Back to Dashboard
+        </a>
+
+        <!-- Review Card -->
+        <div class="review-card">
+            <!-- Header -->
+            <div class="review-header">
+                <div class="review-header-content">
+                    <div class="artist-avatar-large">🎸</div>
+                    <h1 class="artist-name-large">{{ artist.artist_name }}</h1>
+                    <div class="artist-genre-large">{{ artist.genre }}</div>
+                    <div>
+                        {% if artist.status == 'pending' %}
+                        <span class="status-badge-large pending">⏳ Pending Review</span>
+                        {% elif artist.status == 'approved' %}
+                        <span class="status-badge-large approved">✓ Approved</span>
+                        {% else %}
+                        <span class="status-badge-large rejected">✕ Rejected</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="review-content">
+                <!-- Basic Information -->
+                <div class="section">
+                    <h2 class="section-title">📋 Basic Information</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Email</div>
+                            <div class="info-value">{{ artist.email }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Country</div>
+                            <div class="info-value">{{ artist.country }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Application Date</div>
+                            <div class="info-value">{{ artist.application_date.strftime('%B %d, %Y') }}</div>
+                        </div>
+                        {% if artist.approved_date %}
+                        <div class="info-item">
+                            <div class="info-label">Approved Date</div>
+                            <div class="info-value">{{ artist.approved_date.strftime('%B %d, %Y') }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Artist Bio -->
+                <div class="section">
+                    <h2 class="section-title">📝 Artist Bio</h2>
+                    <div class="bio-content">
+                        {{ artist.bio }}
+                    </div>
+                </div>
+
+                <!-- Social Media & Links -->
+                <div class="section">
+                    <h2 class="section-title">🔗 Social Media & Links</h2>
+                    <div class="social-links">
+                        <a href="{{ artist.instagram_url }}" target="_blank" class="social-link {% if not artist.instagram_url %}disabled{% endif %}">
+                            <span class="social-icon">📸</span>
+                            <span>{{ artist.instagram_url if artist.instagram_url else 'Not provided' }}</span>
+                        </a>
+                        <a href="{{ artist.twitter_url }}" target="_blank" class="social-link {% if not artist.twitter_url %}disabled{% endif %}">
+                            <span class="social-icon">🐦</span>
+                            <span>{{ artist.twitter_url if artist.twitter_url else 'Not provided' }}</span>
+                        </a>
+                        <a href="{{ artist.spotify_url }}" target="_blank" class="social-link {% if not artist.spotify_url %}disabled{% endif %}">
+                            <span class="social-icon">🎵</span>
+                            <span>{{ artist.spotify_url if artist.spotify_url else 'Not provided' }}</span>
+                        </a>
+                        <a href="{{ artist.youtube_url }}" target="_blank" class="social-link {% if not artist.youtube_url %}disabled{% endif %}">
+                            <span class="social-icon">📺</span>
+                            <span>{{ artist.youtube_url if artist.youtube_url else 'Not provided' }}</span>
+                        </a>
+                        <a href="{{ artist.website_url }}" target="_blank" class="social-link {% if not artist.website_url %}disabled{% endif %}">
+                            <span class="social-icon">🌐</span>
+                            <span>{{ artist.website_url if artist.website_url else 'Not provided' }}</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Verification Proof -->
+                <div class="section">
+                    <h2 class="section-title">✅ Verification Proof</h2>
+                    <div class="proof-content">
+                        {{ artist.proof_description }}
+                    </div>
+                </div>
+
+                <!-- Rejection Reason (if rejected) -->
+                {% if artist.status == 'rejected' and artist.rejection_reason %}
+                <div class="section">
+                    <h2 class="section-title">❌ Rejection Reason</h2>
+                    <div class="rejection-box">
+                        <div class="rejection-title">
+                            <span>⚠️</span>
+                            <span>Application was rejected for the following reason:</span>
+                        </div>
+                        {{ artist.rejection_reason }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Action Buttons (only for pending applications) -->
+            {% if artist.status == 'pending' %}
+            <div class="action-section">
+                <div class="action-buttons">
+                    <form method="POST" action="/admin/approve_artist/{{ artist.artist_id }}" style="flex: 1;">
+                        <button type="submit" class="action-btn approve-btn">
+                            <span>✓</span>
+                            <span>Approve Artist</span>
+                        </button>
+                    </form>
+                    <button type="button" class="action-btn reject-btn" onclick="openRejectModal()">
+                        <span>✕</span>
+                        <span>Reject Application</span>
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Rejection Modal -->
+<div class="modal" id="rejectModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Reject Application</h3>
+            <p class="modal-subtitle">Please provide a reason for rejecting this application</p>
+        </div>
+        <form method="POST" action="/admin/reject_artist/{{ artist.artist_id }}">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="rejection_reason" class="form-label">Rejection Reason *</label>
+                    <textarea 
+                        id="rejection_reason" 
+                        name="rejection_reason" 
+                        class="form-textarea"
+                        placeholder="Explain why this application is being rejected..."
+                        required
+                        minlength="20"
+                    ></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn modal-btn-cancel" onclick="closeRejectModal()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="modal-btn modal-btn-confirm">
+                        Reject Application
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openRejectModal() {
+        document.getElementById('rejectModal').classList.add('active');
+    }
+
+    function closeRejectModal() {
+        document.getElementById('rejectModal').classList.remove('active');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('rejectModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeRejectModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeRejectModal();
+        }
+    });
+</script>
+{% endblock %}

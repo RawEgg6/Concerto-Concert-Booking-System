@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulate Payment - Concerto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-wrapper {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .payment-wrapper::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: backgroundMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes backgroundMove {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        .payment-card {
+            background: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-header::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .payment-header::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .payment-icon {
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1.25rem;
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .payment-header h2 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            letter-spacing: -0.5px;
+        }
+
+        .dev-notice {
+            background: #fef3c7;
+            border-left: 5px solid #f59e0b;
+            padding: 1.25rem 1.5rem;
+            margin: 2rem 2.5rem 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+        }
+
+        .dev-notice-title {
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .dev-notice-text {
+            color: #78350f;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .payment-form {
+            padding: 2.5rem;
+        }
+
+        .ticket-id-display {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 3px solid #10b981;
+            padding: 1.25rem 1.5rem;
+            border-radius: 14px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ticket-id-icon {
+            font-size: 1.75rem;
+            flex-shrink: 0;
+        }
+
+        .ticket-id-content {
+            flex: 1;
+        }
+
+        .ticket-id-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #065f46;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .ticket-id-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #047857;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.625rem;
+            letter-spacing: 0.2px;
+        }
+
+        .form-label .required {
+            color: #ef4444;
+            margin-left: 3px;
+            font-weight: 700;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 1.125rem 1.25rem;
+            font-size: 1rem;
+            color: #1e293b;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+        }
+
+        .form-input[type="number"] {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 3rem;
+        }
+
+        .form-input:hover,
+        .form-select:hover {
+            border-color: #cbd5e1;
+            background: #ffffff;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            background: #ffffff;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1.125rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.15rem;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .input-icon-wrapper .form-input {
+            padding-left: 3.25rem;
+        }
+
+        .form-help {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.625rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .form-help::before {
+            content: '💡';
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .status-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .status-option {
+            position: relative;
+        }
+
+        .status-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .status-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1.125rem;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .status-option input[type="radio"]:checked + label {
+            border-color: #667eea;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .status-option label:hover {
+            border-color: #cbd5e1;
+            background: #ffffff;
+        }
+
+        .status-success {
+            color: #059669;
+        }
+
+        .status-option input[type="radio"]:checked + .status-success {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-color: #10b981;
+        }
+
+        .status-failed {
+            color: #dc2626;
+        }
+
+        .status-option input[type="radio"]:checked + .status-failed {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border-color: #ef4444;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            margin-top: 1.5rem;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .payment-card {
+                border-radius: 20px;
+            }
+
+            .payment-header {
+                padding: 2rem;
+            }
+
+            .payment-icon {
+                width: 75px;
+                height: 75px;
+                font-size: 2.5rem;
+            }
+
+            .payment-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .payment-form {
+                padding: 2rem;
+            }
+
+            .dev-notice {
+                margin: 1.75rem 2rem 0;
+            }
+
+            .status-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 10px;
+            }
+
+            .payment-header {
+                padding: 1.75rem;
+            }
+
+            .payment-header h2 {
+                font-size: 1.35rem;
+            }
+
+            .payment-form {
+                padding: 1.75rem 1.5rem;
+            }
+
+            .dev-notice {
+                margin: 1.5rem 1.5rem 0;
+                padding: 1rem 1.25rem;
+            }
+
+            .ticket-id-display {
+                padding: 1rem 1.25rem;
+            }
+
+            .ticket-id-value {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .payment-header {
+                padding: 1.5rem;
+            }
+
+            .payment-icon {
+                width: 65px;
+                height: 65px;
+                font-size: 2rem;
+            }
+
+            .payment-header h2 {
+                font-size: 1.25rem;
+            }
+
+            .payment-form {
+                padding: 1.5rem 1.25rem;
+            }
+
+            .dev-notice {
+                margin: 1.25rem 1.25rem 0;
+            }
+
+            .form-input,
+            .form-select {
+                padding: 1rem 1.125rem;
+                font-size: 0.95rem;
+            }
+
+            .submit-btn {
+                padding: 1.125rem 1.75rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-wrapper">
+        <div class="payment-card">
+            <div class="payment-header">
+                <div class="payment-icon">💳</div>
+                <h2>Payment Simulation</h2>
+            </div>
+
+            <div class="dev-notice">
+                <div class="dev-notice-title">
+                    🔧 Development Mode
+                </div>
+                <div class="dev-notice-text">
+                    This is a simulated payment gateway for testing purposes. No real payment will be processed.
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('payment.payment_gateway') }}" class="payment-form">
+                <input type="hidden" name="ticket_id" value="{{ ticket_id }}">
+
+                <div class="ticket-id-display">
+                    <div class="ticket-id-icon">🎫</div>
+                    <div class="ticket-id-content">
+                        <div class="ticket-id-label">Ticket ID</div>
+                        <div class="ticket-id-value">#{{ ticket_id }}</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount" class="form-label">
+                        Amount <span class="required">*</span>
+                    </label>
+                    <div class="input-icon-wrapper">
+                        <span class="input-icon">₹</span>
+                        <input 
+                            type="number" 
+                            step="0.01" 
+                            id="amount"
+                            name="amount" 
+                            class="form-input"
+                            placeholder="Enter amount"
+                            required
+                            min="0"
+                        >
+                    </div>
+                    <p class="form-help">Enter the payment amount in rupees</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment_method" class="form-label">
+                        Payment Method <span class="required">*</span>
+                    </label>
+                    <select id="payment_method" name="payment_method" class="form-select" required>
+                        <option value="">Select payment method</option>
+                        <option value="credit_card">💳 Credit Card</option>
+                        <option value="debit_card">💳 Debit Card</option>
+                        <option value="upi">📱 UPI</option>
+                        <option value="paypal">🅿️ PayPal</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Simulate Payment Result <span class="required">*</span>
+                    </label>
+                    <div class="status-options">
+                        <div class="status-option">
+                            <input type="radio" id="status_success" name="payment_status" value="success" required>
+                            <label for="status_success" class="status-success">
+                                <span>✅</span>
+                                <span>Success</span>
+                            </label>
+                        </div>
+                        <div class="status-option">
+                            <input type="radio" id="status_failed" name="payment_status" value="failed">
+                            <label for="status_failed" class="status-failed">
+                                <span>❌</span>
+                                <span>Failed</span>
+                            </label>
+                        </div>
+                    </div>
+                    <p class="form-help">Choose whether to simulate a successful or failed payment</p>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    🚀 Submit Payment Simulation
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

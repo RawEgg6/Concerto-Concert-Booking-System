@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block header %}
+    {% if problem %}
+        Booking Cancelled
+    {% else %}
+        Booking Confirmed!
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            color: #333;
+        }
+
+        .ticket-container {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: 0.3s ease-in-out;
+        }
+
+        .ticket-container:hover {
+            transform: translateY(-2px);
+        }
+
+        .status {
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .status.success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status.failed {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status.pending {
+            background-color: #fef3c7;
+            color: #828181;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #111827;
+        }
+
+        .ticket-details {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .ticket-details p {
+            margin: 8px 0;
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #6b7280;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background-color: #3b82f6;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #2563eb;
+        }
+    </style>
+
+    <div class="ticket-container">
+        {% if booking_status == 'cancelled' %}
+            <div class="status failed">Booking Cancelled ❌</div>
+        {% elif booking_status == 'confirmed' %}
+            <div class="status success">Booking Confirmed ✅</div>
+        {% else %}
+            <div class="status pending">Booking Pending ⏳</div>
+        {% endif %}
+
+        <h2>{{ concert_name }}</h2>
+        <p><strong>{{ artist_name }}</strong></p>
+
+        <div class="ticket-details">
+            <p><b>Venue:</b> {{ venue_name }}, {{ venue_location }}</p>
+            <p><b>Date:</b> {{ concert_date }}</p>
+            <p><b>Row:</b> {{ row_no }}</p>
+            <p><b>Seat:</b> {{ seat_no }}</p>
+            <p><b>Price:</b> ₹{{ price }}</p>
+        </div>
+
+        {% if booking_status == 'cancelled' %}
+            <p class="footer-note">We're sorry — this booking was cancelled. If payment was made, it will be refunded automatically.</p>
+            <a href="/index" class="btn">Back to Home</a>
+        {% elif booking_status == 'confirmed' %}
+            <p class="footer-note">Get ready for an unforgettable experience. See you at the show!</p>
+            <a href="/index" class="btn">Back to Home</a>
+        {% else %}
+            <p class="footer-note">Your booking is being processed. Please check back later for updates.</p>
+            <a href="/index" class="btn">Back to Home</a>
+        {% endif %}
+    </div>
+{% endblock %}

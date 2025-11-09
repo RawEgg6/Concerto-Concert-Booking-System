@@ -1,0 +1,394 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    Discover Live Concerts
+{% endblock %}
+
+{% block content %}
+<style>
+    .index-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        padding: 3rem 1rem;
+    }
+
+    .index-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        text-align: center;
+        margin-bottom: 3rem;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .hero-greeting {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.7);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Concert Grid */
+    .concerts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    /* Concert Card */
+    .concert-card {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        animation: slideUp 0.6s ease-out;
+        animation-fill-mode: both;
+    }
+
+    .concert-card:nth-child(1) { animation-delay: 0.1s; }
+    .concert-card:nth-child(2) { animation-delay: 0.2s; }
+    .concert-card:nth-child(3) { animation-delay: 0.3s; }
+    .concert-card:nth-child(4) { animation-delay: 0.4s; }
+    .concert-card:nth-child(5) { animation-delay: 0.5s; }
+    .concert-card:nth-child(6) { animation-delay: 0.6s; }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .concert-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Card Header */
+    .concert-header {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        padding: 2rem 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .concert-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -30%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .concert-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+        letter-spacing: -0.5px;
+    }
+
+    .concert-date {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .concert-date::before {
+        content: '📅';
+        font-size: 1rem;
+    }
+
+    /* Card Body */
+    .concert-body {
+        padding: 1.5rem;
+    }
+
+    .concert-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+        color: #475569;
+    }
+
+    .info-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #334155;
+        min-width: 60px;
+    }
+
+    .info-value {
+        color: #64748b;
+    }
+
+    /* Genre Badge */
+    .genre-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.875rem;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        color: #92400e;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    /* Book Button */
+    .book-btn {
+        width: 100%;
+        padding: 0.875rem 1.5rem;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .book-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .book-btn:active {
+        transform: translateY(0);
+    }
+
+    .book-btn::after {
+        content: '→';
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+    }
+
+    .book-btn:hover::after {
+        transform: translateX(4px);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+
+    .empty-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 0.75rem;
+    }
+
+    .empty-text {
+        color: #64748b;
+        font-size: 1.1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .concerts-grid {
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .index-wrapper {
+            padding: 2rem 1rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .hero-greeting {
+            font-size: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+
+        .concerts-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .index-wrapper {
+            padding: 1.5rem 0.5rem;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .concert-header {
+            padding: 1.5rem 1.25rem;
+        }
+
+        .concert-title {
+            font-size: 1.25rem;
+        }
+
+        .concert-body {
+            padding: 1.25rem;
+        }
+    }
+</style>
+
+<div class="index-wrapper">
+    <div class="index-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <p class="hero-greeting">👋 Welcome back, {{ username }}!</p>
+            <h1 class="hero-title">Discover Live Concerts</h1>
+            <p class="hero-subtitle">Book tickets to the hottest shows and experience unforgettable performances</p>
+        </div>
+
+        <!-- Concert Cards -->
+        {% if concerts and concerts|length > 0 %}
+            <div class="concerts-grid">
+                {% for concert in concerts %}
+                <div class="concert-card">
+                    <div class="concert-header">
+                        <h3 class="concert-title">{{ concert[1] }}</h3>
+                        <p class="concert-date">{{ concert[2] }}</p>
+                    </div>
+                    
+                    <div class="concert-body">
+                        <div class="concert-info">
+                            <div class="info-item">
+                                <div class="info-icon">🎤</div>
+                                <div>
+                                    <span class="info-label">Artist:</span>
+                                    <span class="info-value">{{ concert[3] }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-icon">🎵</div>
+                                <div>
+                                    <span class="info-label">Genre:</span>
+                                    <span class="genre-badge">{{ concert[4] }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-icon">🏛️</div>
+                                <div>
+                                    <span class="info-label">Venue:</span>
+                                    <span class="info-value">{{ concert[5] }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-icon">📍</div>
+                                <div>
+                                    <span class="info-label">Location:</span>
+                                    <span class="info-value">{{ concert[6] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="book-btn" onclick="window.location.href='/book/{{ concert[0] }}'">
+                            Book Tickets
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🎪</div>
+                <h2 class="empty-title">No Concerts Available</h2>
+                <p class="empty-text">Check back soon for upcoming shows!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

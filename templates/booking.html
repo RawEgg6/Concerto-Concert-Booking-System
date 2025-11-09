@@ -1,0 +1,700 @@
+{% extends "base.html" %}
+
+{% block header %}Book Your Seats{% endblock %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .booking-wrapper {
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .booking-wrapper::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: backgroundMove 20s linear infinite;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    @keyframes backgroundMove {
+        0% {
+            transform: translate(0, 0);
+        }
+        100% {
+            transform: translate(50px, 50px);
+        }
+    }
+
+    .booking-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .concert-info {
+        background: #ffffff;
+        padding: 2.5rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .concert-info h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .concert-info p {
+        font-size: 1.05rem;
+        color: #475569;
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .concert-info strong {
+        color: #1e293b;
+        font-weight: 600;
+    }
+    
+    .seat-legend {
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        animation: slideUp 0.7s ease-out;
+    }
+
+    .legend-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .legend-items {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .legend-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .legend-box {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .legend-item:hover .legend-box {
+        transform: scale(1.1);
+    }
+    
+    .legend-box.gold { 
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+    }
+    
+    .legend-box.silver { 
+        background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+    }
+    
+    .legend-box.bronze { 
+        background: linear-gradient(135deg, #cd7f32, #e8a87c);
+    }
+
+    .legend-box.sold { 
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        position: relative;
+    }
+
+    .legend-box.sold::after {
+        content: '✕';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .legend-item span {
+        font-weight: 600;
+        color: #334155;
+        font-size: 0.95rem;
+    }
+    
+    .stage-container {
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        animation: slideUp 0.8s ease-out;
+    }
+
+    .stage {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        text-align: center;
+        padding: 2rem;
+        border-radius: 16px;
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stage::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+        animation: stageShine 3s linear infinite;
+    }
+
+    @keyframes stageShine {
+        0% {
+            transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        }
+        100% {
+            transform: translateX(100%) translateY(100%) rotate(45deg);
+        }
+    }
+    
+    .seating-container {
+        background: #ffffff;
+        padding: 2.5rem;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        animation: slideUp 0.9s ease-out;
+    }
+
+    .seating-section {
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1e293b;
+    }
+    
+    .seat-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        gap: 1.5rem;
+    }
+    
+    .row-label {
+        font-weight: 700;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .seats {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        flex: 1;
+    }
+    
+    .seat {
+        width: 70px;
+        height: 70px;
+        border: 3px solid #e2e8f0;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.85rem;
+        position: relative;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .seat:not(.sold):hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        border-color: #667eea;
+    }
+    
+    .seat.gold {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+    }
+    
+    .seat.silver {
+        background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+    }
+    
+    .seat.bronze {
+        background: linear-gradient(135deg, #cd7f32, #e8a87c);
+    }
+
+    .seat.sold {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        cursor: not-allowed;
+        opacity: 0.6;
+        position: relative;
+    }
+
+    .seat.sold::before {
+        content: '✕';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2rem;
+        color: white;
+        font-weight: bold;
+        z-index: 2;
+    }
+
+    .seat.sold:hover {
+        transform: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-color: #e2e8f0;
+    }
+
+    .seat.sold .seat-number,
+    .seat.sold .seat-price {
+        opacity: 0.5;
+    }
+    
+    .seat-number {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #1e293b;
+        z-index: 1;
+    }
+    
+    .seat-price {
+        font-size: 0.75rem;
+        color: #475569;
+        font-weight: 600;
+        z-index: 1;
+    }
+    
+    .booking-form {
+        display: none;
+    }
+    
+    .seat input[type="radio"]:checked ~ label {
+        outline: 4px solid #667eea;
+        outline-offset: 2px;
+    }
+
+    .seat.selected {
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2), 0 12px 24px rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px) scale(1.05);
+    }
+    
+    .book-button {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        padding: 1.25rem 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: none;
+        z-index: 1000;
+        letter-spacing: 0.3px;
+    }
+    
+    .book-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+    }
+
+    .book-button:active {
+        transform: translateY(-1px);
+    }
+    
+    .book-button.show {
+        display: block;
+        animation: bounceIn 0.5s ease-out;
+    }
+
+    @keyframes bounceIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.3) translateY(100px);
+        }
+        50% {
+            transform: scale(1.05) translateY(-10px);
+        }
+        70% {
+            transform: scale(0.9) translateY(0);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    .selected-info {
+        position: fixed;
+        bottom: 110px;
+        right: 30px;
+        background: white;
+        padding: 1.5rem 2rem;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        display: none;
+        z-index: 1000;
+        min-width: 250px;
+        animation: slideInUp 0.4s ease-out;
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .selected-info.show {
+        display: block;
+    }
+
+    .selected-info strong {
+        font-size: 1rem;
+        color: #1e293b;
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 700;
+    }
+
+    .selected-info #selectedSeatText {
+        font-size: 1.05rem;
+        color: #667eea;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .selected-info #selectedPriceText {
+        font-size: 1.25rem;
+        color: #10b981;
+        font-weight: 700;
+        display: block;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .booking-wrapper {
+            padding: 1rem 0.5rem;
+        }
+
+        .concert-info {
+            padding: 1.75rem;
+            border-radius: 16px;
+        }
+
+        .concert-info h2 {
+            font-size: 1.5rem;
+        }
+
+        .seat-legend {
+            padding: 1.5rem;
+        }
+
+        .legend-items {
+            gap: 1rem;
+        }
+
+        .legend-item {
+            padding: 0.625rem 1rem;
+        }
+
+        .stage {
+            font-size: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .seating-container {
+            padding: 1.5rem;
+        }
+
+        .seat {
+            width: 60px;
+            height: 60px;
+        }
+
+        .row-label {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+        }
+
+        .book-button {
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+
+        .selected-info {
+            bottom: 90px;
+            right: 20px;
+            padding: 1.25rem 1.5rem;
+            min-width: 200px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .concert-info {
+            padding: 1.5rem;
+        }
+
+        .concert-info h2 {
+            font-size: 1.3rem;
+        }
+
+        .concert-info p {
+            font-size: 0.9rem;
+        }
+
+        .seat {
+            width: 50px;
+            height: 50px;
+        }
+
+        .seat-number {
+            font-size: 0.85rem;
+        }
+
+        .seat-price {
+            font-size: 0.65rem;
+        }
+
+        .seats {
+            gap: 0.75rem;
+        }
+
+        .seat-row {
+            gap: 1rem;
+        }
+
+        .legend-box {
+            width: 30px;
+            height: 30px;
+        }
+
+        .legend-item span {
+            font-size: 0.85rem;
+        }
+    }
+</style>
+
+<div class="booking-wrapper">
+    <div class="booking-container">
+        <div class="concert-info">
+            <h2>🎵 {{ concert_name }}</h2>
+            <p><strong>📅 Date:</strong> {{ concert_date }}</p>
+            <p><strong>📍 Venue:</strong> {{ concert_venue }}</p>
+        </div>
+        
+        <div class="seat-legend">
+            <h3 class="legend-title">🎫 Seat Legend</h3>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-box gold"></div>
+                    <span>Gold - ₹1500</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box silver"></div>
+                    <span>Silver - ₹1000</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box bronze"></div>
+                    <span>Bronze - ₹500</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box sold"></div>
+                    <span>Sold Out</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stage-container">
+            <div class="stage">🎭 STAGE 🎭</div>
+        </div>
+
+        <div class="seating-container">
+            <form action="{{ url_for('book.confirm_booking') }}" method="POST" id="bookingForm">
+                {% set rows = {} %}
+                {% for ticket in tickets %}
+                    {% set row = ticket[1] %}
+                    {% set seat_no = ticket[2] %}
+                    {% set seat_type = ticket[3]|lower %}
+                    {% set price = ticket[4] %}
+                    {% set ticket_id = ticket[0] %}
+                    {% set status = ticket[5]|lower %}
+                    
+                    {% if row not in rows %}
+                        {% set _ = rows.update({row: []}) %}
+                    {% endif %}
+                    {% set _ = rows[row].append((ticket_id, seat_no, seat_type, price, status)) %}
+                {% endfor %}
+                
+                {% for row in ['A', 'B', 'C', 'D', 'E'] %}
+                    {% if row in rows %}
+                        <div class="seating-section">
+                            <div class="seat-row">
+                                <div class="row-label">{{ row }}</div>
+                                <div class="seats">
+                                    {% for ticket_id, seat_no, seat_type, price, status in rows[row]|sort(attribute='1') %}
+                                        <div class="seat {{ seat_type }} {% if status == 'sold' %}sold{% endif %}" 
+                                             {% if status != 'sold' %}onclick="selectSeat('{{ ticket_id }}', '{{ row }}{{ seat_no }}', '{{ price }}', '{{ seat_type|title }}', this)"{% endif %}>
+                                            {% if status != 'sold' %}
+                                                <input type="radio" name="ticket_id" value="{{ ticket_id }}" id="seat_{{ ticket_id }}" class="booking-form">
+                                                <label for="seat_{{ ticket_id }}" style="cursor: pointer; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 1;">
+                                                    <span class="seat-number">{{ seat_no }}</span>
+                                                    <span class="seat-price">₹{{ price }}</span>
+                                                </label>
+                                            {% else %}
+                                                <span class="seat-number">{{ seat_no }}</span>
+                                                <span class="seat-price">₹{{ price }}</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                
+                <div class="selected-info" id="selectedInfo">
+                    <strong>🎟️ Selected Seat:</strong>
+                    <span id="selectedSeatText">None</span>
+                    <span id="selectedPriceText"></span>
+                </div>
+                
+                <button type="submit" class="book-button" id="bookButton">
+                    🎫 Book Selected Seat
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentlySelected = null;
+
+    function selectSeat(ticketId, seatLabel, price, seatType, seatElement) {
+        // Remove previous selection styling
+        if (currentlySelected) {
+            currentlySelected.classList.remove('selected');
+        }
+
+        // Add selection styling to current seat
+        seatElement.classList.add('selected');
+        currentlySelected = seatElement;
+
+        // Update radio button
+        document.getElementById('seat_' + ticketId).checked = true;
+        
+        // Update selected info
+        document.getElementById('selectedSeatText').textContent = 'Row ' + seatLabel + ' (' + seatType + ')';
+        document.getElementById('selectedPriceText').textContent = 'Price: ₹' + price;
+        
+        // Show booking button and info
+        document.getElementById('bookButton').classList.add('show');
+        document.getElementById('selectedInfo').classList.add('show');
+    }
+</script>
+
+{% endblock %}

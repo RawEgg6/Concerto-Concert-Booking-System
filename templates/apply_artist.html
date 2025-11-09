@@ -1,0 +1,783 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    Become an Artist
+{% endblock %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .artist-app-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        padding: 2.5rem 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .artist-app-wrapper::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: backgroundMove 20s linear infinite;
+        pointer-events: none;
+    }
+
+    @keyframes backgroundMove {
+        0% {
+            transform: translate(0, 0);
+        }
+        100% {
+            transform: translate(50px, 50px);
+        }
+    }
+
+    .artist-app-card {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        z-index: 1;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Header Section */
+    .artist-app-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 3.5rem 2.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .artist-app-header::before {
+        content: '';
+        position: absolute;
+        top: -100px;
+        right: -100px;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        z-index: 0;
+    }
+
+    .artist-app-header::after {
+        content: '';
+        position: absolute;
+        bottom: -50px;
+        left: -50px;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        z-index: 0;
+    }
+
+    .artist-app-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .artist-app-icon {
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3.5rem;
+        margin: 0 auto 1.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .artist-app-icon:hover {
+        transform: scale(1.05) rotate(5deg);
+    }
+
+    .artist-app-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 0.75rem;
+        letter-spacing: -1px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .artist-app-subtitle {
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 1.05rem;
+        line-height: 1.7;
+        max-width: 650px;
+        margin: 0 auto;
+        font-weight: 400;
+    }
+
+    /* Form Section */
+    .artist-app-form {
+        padding: 3rem 2.5rem;
+        background: #ffffff;
+    }
+
+    .form-section {
+        margin-bottom: 3rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #f1f5f9;
+        position: relative;
+    }
+
+    .section-header::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .section-icon {
+        font-size: 1.75rem;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        letter-spacing: -0.3px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.75rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.75rem;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.625rem;
+        letter-spacing: 0.2px;
+    }
+
+    .form-label .required {
+        color: #ef4444;
+        margin-left: 3px;
+        font-weight: 700;
+    }
+
+    .form-label .optional {
+        color: #94a3b8;
+        font-weight: 400;
+        font-size: 0.85rem;
+        margin-left: 5px;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+        width: 100%;
+        padding: 1rem 1.125rem;
+        font-size: 0.95rem;
+        color: #1e293b;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    }
+
+    .form-textarea {
+        min-height: 140px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .form-input:hover,
+    .form-textarea:hover,
+    .form-select:hover {
+        border-color: #cbd5e1;
+        background: #ffffff;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+        outline: none;
+        background: #ffffff;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-input::placeholder,
+    .form-textarea::placeholder {
+        color: #94a3b8;
+    }
+
+    /* Input Icons */
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1.125rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.15rem;
+        opacity: 0.6;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
+    .input-wrapper .form-input:focus ~ .input-icon,
+    .input-wrapper:hover .input-icon {
+        opacity: 0.9;
+    }
+
+    .input-wrapper .form-input {
+        padding-left: 3.25rem;
+    }
+
+    /* Form Help Text */
+    .form-help {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-top: 0.625rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        line-height: 1.6;
+        padding-left: 0.25rem;
+    }
+
+    .form-help::before {
+        content: '💡';
+        font-size: 0.95rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    /* Info Box */
+    .info-box {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-left: 5px solid #f59e0b;
+        padding: 1.5rem 1.75rem;
+        border-radius: 14px;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+    }
+
+    .info-box-title {
+        font-weight: 700;
+        color: #92400e;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        font-size: 1.05rem;
+    }
+
+    .info-box-content {
+        color: #78350f;
+        font-size: 0.92rem;
+        line-height: 1.7;
+    }
+
+    .info-box ul {
+        margin: 0.75rem 0 0 1.5rem;
+        padding: 0;
+    }
+
+    .info-box li {
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+        width: 100%;
+        padding: 1.25rem 1.75rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        margin-top: 1.5rem;
+        letter-spacing: 0.3px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .submit-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .submit-btn:hover::before {
+        left: 100%;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+    }
+
+    .submit-btn:active {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Cancel Link */
+    .cancel-link {
+        display: block;
+        text-align: center;
+        margin-top: 1.75rem;
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .cancel-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .cancel-link a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: width 0.3s ease;
+    }
+
+    .cancel-link a:hover {
+        color: #764ba2;
+    }
+
+    .cancel-link a:hover::after {
+        width: 100%;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .artist-app-wrapper {
+            padding: 1.5rem 0.75rem;
+        }
+
+        .artist-app-card {
+            border-radius: 20px;
+        }
+
+        .artist-app-header {
+            padding: 3rem 2rem;
+        }
+
+        .artist-app-title {
+            font-size: 2rem;
+        }
+
+        .artist-app-subtitle {
+            font-size: 0.95rem;
+        }
+
+        .artist-app-icon {
+            width: 85px;
+            height: 85px;
+            font-size: 3rem;
+        }
+
+        .artist-app-form {
+            padding: 2.5rem 2rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1.75rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .artist-app-wrapper {
+            padding: 1rem 0.5rem;
+        }
+
+        .artist-app-header {
+            padding: 2.5rem 1.5rem;
+        }
+
+        .artist-app-title {
+            font-size: 1.75rem;
+        }
+
+        .artist-app-subtitle {
+            font-size: 0.9rem;
+        }
+
+        .artist-app-icon {
+            width: 75px;
+            height: 75px;
+            font-size: 2.5rem;
+        }
+
+        .artist-app-form {
+            padding: 2rem 1.5rem;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.15rem;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            font-size: 0.9rem;
+        }
+
+        .input-wrapper .form-input {
+            padding-left: 3rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .artist-app-header {
+            padding: 2rem 1.25rem;
+        }
+
+        .artist-app-title {
+            font-size: 1.5rem;
+        }
+
+        .artist-app-form {
+            padding: 1.75rem 1.25rem;
+        }
+
+        .info-box {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .submit-btn {
+            padding: 1.125rem 1.5rem;
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<div class="artist-app-wrapper">
+    <div class="artist-app-card">
+        <!-- Header -->
+        <div class="artist-app-header">
+            <div class="artist-app-header-content">
+                <div class="artist-app-icon">🎸</div>
+                <h1 class="artist-app-title">Apply to Become an Artist</h1>
+                <p class="artist-app-subtitle">
+                    Join Concerto's verified artist community and showcase your talent to thousands of music lovers
+                </p>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" action="/apply_artist" class="artist-app-form">
+            <!-- Info Box -->
+            <div class="info-box">
+                <div class="info-box-title">
+                    📋 Application Requirements
+                </div>
+                <div class="info-box-content">
+                    <ul>
+                        <li>Provide verifiable proof of your artist identity</li>
+                        <li>Link to your official social media or music platforms</li>
+                        <li>Applications are reviewed manually - typically within 2-3 business days</li>
+                        <li>Only verified artists can create and manage concerts</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Basic Information -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-icon">👤</span>
+                    <h2 class="section-title">Basic Information</h2>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="artist_name" class="form-label">
+                            Artist/Stage Name <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="artist_name" 
+                                name="artist_name" 
+                                class="form-input"
+                                placeholder="e.g., DJ Vibes, The Rockers"
+                                required
+                                maxlength="255"
+                            >
+                            <span class="input-icon">🎤</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="genre" class="form-label">
+                            Genre <span class="required">*</span>
+                        </label>
+                        <select id="genre" name="genre" class="form-select" required>
+                            <option value="">Select your genre</option>
+                            <option value="Rock">Rock</option>
+                            <option value="Pop">Pop</option>
+                            <option value="Hip Hop">Hip Hop</option>
+                            <option value="Electronic">Electronic</option>
+                            <option value="Jazz">Jazz</option>
+                            <option value="Classical">Classical</option>
+                            <option value="Country">Country</option>
+                            <option value="R&B">R&B</option>
+                            <option value="Metal">Metal</option>
+                            <option value="Indie">Indie</option>
+                            <option value="Folk">Folk</option>
+                            <option value="Reggae">Reggae</option>
+                            <option value="Blues">Blues</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="country" class="form-label">
+                        Country <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="country" 
+                            name="country" 
+                            class="form-input"
+                            placeholder="e.g., India, United States"
+                            required
+                            maxlength="100"
+                        >
+                        <span class="input-icon">🌍</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bio" class="form-label">
+                        Artist Bio <span class="required">*</span>
+                    </label>
+                    <textarea 
+                        id="bio" 
+                        name="bio" 
+                        class="form-textarea"
+                        placeholder="Tell us about yourself, your music journey, achievements, and what makes you unique..."
+                        required
+                        minlength="50"
+                    ></textarea>
+                    <p class="form-help">Minimum 50 characters. This will be displayed on your artist profile.</p>
+                </div>
+            </div>
+
+            <!-- Social Media & Verification -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-icon">🔗</span>
+                    <h2 class="section-title">Social Media & Verification</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="instagram_url" class="form-label">
+                        Instagram Profile <span class="optional">(optional)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="url" 
+                            id="instagram_url" 
+                            name="instagram_url" 
+                            class="form-input"
+                            placeholder="https://instagram.com/yourusername"
+                        >
+                        <span class="input-icon">📸</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="twitter_url" class="form-label">
+                        Twitter/X Profile <span class="optional">(optional)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="url" 
+                            id="twitter_url" 
+                            name="twitter_url" 
+                            class="form-input"
+                            placeholder="https://twitter.com/yourusername"
+                        >
+                        <span class="input-icon">🐦</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="spotify_url" class="form-label">
+                        Spotify Artist Page <span class="optional">(optional)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="url" 
+                            id="spotify_url" 
+                            name="spotify_url" 
+                            class="form-input"
+                            placeholder="https://open.spotify.com/artist/..."
+                        >
+                        <span class="input-icon">🎵</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="youtube_url" class="form-label">
+                        YouTube Channel <span class="optional">(optional)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="url" 
+                            id="youtube_url" 
+                            name="youtube_url" 
+                            class="form-input"
+                            placeholder="https://youtube.com/@yourchannel"
+                        >
+                        <span class="input-icon">📺</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="website_url" class="form-label">
+                        Official Website <span class="optional">(optional)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="url" 
+                            id="website_url" 
+                            name="website_url" 
+                            class="form-input"
+                            placeholder="https://yourwebsite.com"
+                        >
+                        <span class="input-icon">🌐</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proof of Identity -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-icon">✅</span>
+                    <h2 class="section-title">Verification Proof</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="proof_description" class="form-label">
+                        Why should you be verified? <span class="required">*</span>
+                    </label>
+                    <textarea 
+                        id="proof_description" 
+                        name="proof_description" 
+                        class="form-textarea"
+                        placeholder="Provide proof of your artist identity. Include links to press coverage, verified social media accounts, music releases, previous performances, awards, or any other evidence that validates your artist status..."
+                        required
+                        minlength="100"
+                    ></textarea>
+                    <p class="form-help">
+                        Minimum 100 characters. Be specific and include verifiable information. 
+                        Examples: "Verified on Spotify with 50k+ followers", "Featured in Rolling Stone Magazine", etc.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">
+                🚀 Submit Application
+            </button>
+
+            <div class="cancel-link">
+                Changed your mind? <a href="/profile">Go back to profile</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,641 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    Create New Concert
+{% endblock %}
+
+{% block content %}
+<style>
+    .create-concert-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        padding: 2rem 1rem;
+    }
+
+    .create-concert-card {
+        max-width: 900px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Header Section */
+    .create-concert-header {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .create-concert-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        z-index: 0;
+    }
+
+    .create-concert-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .create-concert-icon {
+        width: 90px;
+        height: 90px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        margin: 0 auto 1.25rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .create-concert-title {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+    }
+
+    .create-concert-subtitle {
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 1rem;
+    }
+
+    /* Form Section */
+    .create-concert-form {
+        padding: 2.5rem 2rem;
+    }
+
+    .form-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .section-icon {
+        font-size: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.3px;
+    }
+
+    .form-label .required {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+
+    .form-input,
+    .form-select {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+        color: #1e293b;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        font-family: inherit;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+        outline: none;
+        background: white;
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+    }
+
+    .form-input::placeholder {
+        color: #94a3b8;
+    }
+
+    /* Input Icons */
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.1rem;
+        opacity: 0.5;
+    }
+
+    .input-wrapper .form-input {
+        padding-left: 3rem;
+    }
+
+    /* Form Help Text */
+    .form-help {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.35rem;
+        line-height: 1.5;
+    }
+
+    .form-help::before {
+        content: 'ℹ️';
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    /* Date Time Input Styling */
+    .form-input[type="datetime-local"] {
+        cursor: pointer;
+    }
+
+    /* Info Box */
+    .info-box {
+        background: #eff6ff;
+        border-left: 4px solid #3b82f6;
+        padding: 1rem 1.25rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .info-box-title {
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-box-content {
+        color: #1e40af;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    /* Pricing Preview */
+    .pricing-preview {
+        background: #f8fafc;
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-top: 1rem;
+        border: 2px solid #e2e8f0;
+    }
+
+    .pricing-preview-title {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .pricing-item {
+        text-align: center;
+        padding: 1rem;
+        background: white;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+
+    .pricing-item:hover {
+        border-color: #f59e0b;
+        transform: translateY(-2px);
+    }
+
+    .pricing-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .pricing-amount {
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .pricing-amount.gold {
+        color: #f59e0b;
+    }
+
+    .pricing-amount.silver {
+        color: #64748b;
+    }
+
+    .pricing-amount.bronze {
+        color: #cd7f32;
+    }
+
+    .pricing-label {
+        font-size: 0.8rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+        width: 100%;
+        padding: 1.125rem 1.5rem;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        margin-top: 1rem;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(245, 158, 11, 0.5);
+    }
+
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Cancel Link */
+    .cancel-link {
+        display: block;
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .cancel-link a {
+        color: #f59e0b;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+    .cancel-link a:hover {
+        color: #d97706;
+        text-decoration: underline;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .create-concert-wrapper {
+            padding: 1rem 0.5rem;
+        }
+
+        .create-concert-card {
+            border-radius: 20px;
+        }
+
+        .create-concert-header {
+            padding: 2.5rem 1.5rem;
+        }
+
+        .create-concert-title {
+            font-size: 1.85rem;
+        }
+
+        .create-concert-icon {
+            width: 75px;
+            height: 75px;
+            font-size: 2.5rem;
+        }
+
+        .create-concert-form {
+            padding: 2rem 1.5rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .pricing-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .create-concert-header {
+            padding: 2rem 1.25rem;
+        }
+
+        .create-concert-title {
+            font-size: 1.65rem;
+        }
+
+        .create-concert-form {
+            padding: 1.75rem 1.25rem;
+        }
+    }
+</style>
+
+<div class="create-concert-wrapper">
+    <div class="create-concert-card">
+        <!-- Header -->
+        <div class="create-concert-header">
+            <div class="create-concert-header-content">
+                <div class="create-concert-icon">🎤</div>
+                <h1 class="create-concert-title">Create New Concert</h1>
+                <p class="create-concert-subtitle">
+                    Fill in the details to create your concert event
+                </p>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" action="/create_concert" class="create-concert-form" id="concertForm">
+            <!-- Info Box -->
+            <div class="info-box">
+                <div class="info-box-title">
+                    💡 Concert Creation Tips
+                </div>
+                <div class="info-box-content">
+                    Make sure all details are accurate. Tickets will be automatically generated for all seats at the selected venue. You can edit the concert information later from your profile.
+                </div>
+            </div>
+
+            <!-- Concert Details -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-icon">🎸</span>
+                    <h2 class="section-title">Concert Details</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="title" class="form-label">
+                        Concert Title <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🎵</span>
+                        <input 
+                            type="text" 
+                            id="title" 
+                            name="title" 
+                            class="form-input"
+                            placeholder="e.g., Summer Vibes Tour 2026"
+                            required
+                            maxlength="255"
+                        >
+                    </div>
+                    <p class="form-help">Choose a catchy and descriptive title for your concert</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="date_time" class="form-label">
+                        Date & Time <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📅</span>
+                        <input 
+                            type="datetime-local" 
+                            id="date_time" 
+                            name="date_time" 
+                            class="form-input"
+                            required
+                            min="{{ min_datetime }}"
+                        >
+                    </div>
+                    <p class="form-help">Select the date and time when the concert will take place</p>
+                </div>
+            </div>
+
+            <!-- Venue Selection -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-icon">🏛️</span>
+                    <h2 class="section-title">Venue Information</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="venue_id" class="form-label">
+                        Select Venue <span class="required">*</span>
+                    </label>
+                    <select id="venue_id" name="venue_id" class="form-select" required>
+                        <option value="">Choose a venue</option>
+                        {% for venue in venues %}
+                        <option value="{{ venue.venue_id }}">
+                            {{ venue.venue_name }} - {{ venue.location }} (Capacity: {{ venue.capacity }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <p class="form-help">Select the venue where your concert will be held</p>
+                </div>
+            </div>
+
+            <!-- Ticket Pricing Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <span class="section-icon">🎫</span>
+                    <h2 class="section-title">Ticket Pricing</h2>
+                </div>
+
+                <div class="info-box" style="background: #fef3c7; border-left-color: #f59e0b;">
+                    <div class="info-box-title" style="color: #92400e;">
+                        💰 Set Your Ticket Prices
+                    </div>
+                    <div class="info-box-content" style="color: #78350f;">
+                        Set prices for each seating category. Tickets will be automatically generated for all available seats at the selected venue.
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gold_price" class="form-label">
+                            Gold Ticket Price <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">💛</span>
+                            <input 
+                                type="number" 
+                                id="gold_price" 
+                                name="gold_price" 
+                                class="form-input"
+                                placeholder="5000"
+                                required
+                                min="0"
+                                step="0.01"
+                            >
+                        </div>
+                        <p class="form-help">Price for Gold/VIP seats (₹)</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="silver_price" class="form-label">
+                            Silver Ticket Price <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🥈</span>
+                            <input 
+                                type="number" 
+                                id="silver_price" 
+                                name="silver_price" 
+                                class="form-input"
+                                placeholder="3000"
+                                required
+                                min="0"
+                                step="0.01"
+                            >
+                        </div>
+                        <p class="form-help">Price for Silver/Premium seats (₹)</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bronze_price" class="form-label">
+                        Bronze Ticket Price <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🥉</span>
+                        <input 
+                            type="number" 
+                            id="bronze_price" 
+                            name="bronze_price" 
+                            class="form-input"
+                            placeholder="1500"
+                            required
+                            min="0"
+                            step="0.01"
+                        >
+                    </div>
+                    <p class="form-help">Price for Bronze/General seats (₹)</p>
+                </div>
+
+                <!-- Pricing Preview -->
+                <div class="pricing-preview">
+                    <div class="pricing-preview-title">
+                        📊 Pricing Preview:
+                    </div>
+                    <div class="pricing-grid">
+                        <div class="pricing-item">
+                            <div class="pricing-icon">💛</div>
+                            <div class="pricing-amount gold">₹<span id="gold_preview">0</span></div>
+                            <div class="pricing-label">Gold</div>
+                        </div>
+                        <div class="pricing-item">
+                            <div class="pricing-icon">🥈</div>
+                            <div class="pricing-amount silver">₹<span id="silver_preview">0</span></div>
+                            <div class="pricing-label">Silver</div>
+                        </div>
+                        <div class="pricing-item">
+                            <div class="pricing-icon">🥉</div>
+                            <div class="pricing-amount bronze">₹<span id="bronze_preview">0</span></div>
+                            <div class="pricing-label">Bronze</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">
+                🚀 Create Concert
+            </button>
+
+            <div class="cancel-link">
+                Changed your mind? <a href="/profile">Go back to profile</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Live pricing preview
+    const goldInput = document.getElementById('gold_price');
+    const silverInput = document.getElementById('silver_price');
+    const bronzeInput = document.getElementById('bronze_price');
+    
+    const goldPreview = document.getElementById('gold_preview');
+    const silverPreview = document.getElementById('silver_preview');
+    const bronzePreview = document.getElementById('bronze_preview');
+    
+    function updatePreview() {
+        goldPreview.textContent = goldInput.value || '0';
+        silverPreview.textContent = silverInput.value || '0';
+        bronzePreview.textContent = bronzeInput.value || '0';
+    }
+    
+    goldInput.addEventListener('input', updatePreview);
+    silverInput.addEventListener('input', updatePreview);
+    bronzeInput.addEventListener('input', updatePreview);
+    
+    // Validate pricing (Gold > Silver > Bronze)
+    const form = document.getElementById('concertForm');
+    form.addEventListener('submit', function(e) {
+        const gold = parseFloat(goldInput.value);
+        const silver = parseFloat(silverInput.value);
+        const bronze = parseFloat(bronzeInput.value);
+        
+        if (gold <= silver || silver <= bronze) {
+            e.preventDefault();
+            alert('⚠️ Pricing hierarchy error!\n\nGold price must be greater than Silver price.\nSilver price must be greater than Bronze price.\n\nPlease adjust your prices accordingly.');
+            return false;
+        }
+    });
+</script>
+{% endblock %}

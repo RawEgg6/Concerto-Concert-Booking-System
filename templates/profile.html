@@ -1,0 +1,729 @@
+{% extends "base.html" %}
+
+{% block header %}
+    {{ name }}'s Profile
+{% endblock %}
+
+{% block content %}
+<style>
+    .profile-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        padding: 2rem 1rem;
+    }
+
+    .profile-card {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Header Section */
+    .profile-header {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        padding: 3rem 2.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Artist Header - Different gradient for artists */
+    .profile-header.artist {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        z-index: 0;
+    }
+
+    .profile-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Action Buttons */
+    .profile-actions {
+        position: absolute;
+        top: 2rem;
+        right: 2.5rem;
+        display: flex;
+        gap: 0.75rem;
+        z-index: 2;
+    }
+
+    .edit-profile-btn,
+    .create-concert-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        backdrop-filter: blur(10px);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .edit-profile-btn {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .edit-profile-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .edit-profile-btn::before {
+        content: '✏️';
+        font-size: 1.1rem;
+    }
+
+    .edit-profile-btn.complete {
+        background: rgba(251, 191, 36, 0.3);
+        border-color: rgba(251, 191, 36, 0.5);
+        animation: pulse 2s infinite;
+    }
+
+    .create-concert-btn {
+        background: rgba(34, 197, 94, 0.3);
+        border-color: rgba(34, 197, 94, 0.5);
+    }
+
+    .create-concert-btn:hover {
+        background: rgba(34, 197, 94, 0.5);
+        border-color: rgba(34, 197, 94, 0.7);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(34, 197, 94, 0.3);
+    }
+
+    .create-concert-btn::before {
+        content: '🎤';
+        font-size: 1.1rem;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4);
+        }
+        50% {
+            box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
+        }
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .profile-name {
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+    }
+
+    .profile-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-details {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .profile-detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 0.95rem;
+    }
+
+    .profile-detail-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .profile-detail-text strong {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.8;
+        margin-bottom: 2px;
+    }
+
+    /* Container for sections */
+    .content-container {
+        padding: 3rem 2.5rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title::before {
+        content: '';
+        width: 4px;
+        height: 24px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border-radius: 2px;
+    }
+
+    .section-title.artist-section::before {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    /* Artist Concerts Section */
+    .concerts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .concert-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 2px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+
+    .concert-card:hover {
+        border-color: #f59e0b;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(245, 158, 11, 0.2);
+    }
+
+    .concert-card-header {
+        margin-bottom: 1rem;
+    }
+
+    .concert-card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .concert-card-date {
+        color: #64748b;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .concert-card-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #475569;
+    }
+
+    .concert-card-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .concert-btn {
+        flex: 1;
+        padding: 0.625rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .concert-btn.edit {
+        background: #f1f5f9;
+        color: #475569;
+        border: 2px solid #e2e8f0;
+    }
+
+    .concert-btn.edit:hover {
+        background: #e2e8f0;
+    }
+
+    .concert-btn.view {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+    }
+
+    .concert-btn.view:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Table Styles */
+    .bookings-table-wrapper {
+        overflow-x: auto;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .bookings-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 0.9rem;
+    }
+
+    .bookings-table thead {
+        background: #f8fafc;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .bookings-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e2e8f0;
+        white-space: nowrap;
+    }
+
+    .bookings-table td {
+        padding: 1.25rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+        vertical-align: middle;
+    }
+
+    .bookings-table tbody tr {
+        transition: all 0.2s ease;
+        background: white;
+    }
+
+    .bookings-table tbody tr:hover {
+        background: #fafbfc;
+        transform: scale(1.01);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .status-badge.confirmed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    /* View Button */
+    .view-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .view-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+
+    .empty-state-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.75rem;
+    }
+
+    .empty-state-text {
+        color: #64748b;
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .empty-state-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.75rem;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .empty-state-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+    }
+
+    .empty-state-btn.artist {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .empty-state-btn.artist:hover {
+        box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.4);
+    }
+
+    /* Divider */
+    .section-divider {
+        height: 1px;
+        background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+        margin: 3rem 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .profile-wrapper {
+            padding: 1rem 0.5rem;
+        }
+
+        .profile-card {
+            border-radius: 20px;
+        }
+
+        .profile-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .profile-actions {
+            flex-direction: column;
+            gap: 0.5rem;
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+
+        .edit-profile-btn,
+        .create-concert-btn {
+            padding: 0.625rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+        }
+
+        .profile-details {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .content-container {
+            padding: 2rem 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+        }
+
+        .concerts-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .bookings-table {
+            font-size: 0.8rem;
+        }
+
+        .bookings-table th,
+        .bookings-table td {
+            padding: 0.75rem 0.5rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            font-size: 2rem;
+        }
+
+        .profile-name {
+            font-size: 1.25rem;
+        }
+
+        .profile-actions {
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .edit-profile-btn,
+        .create-concert-btn {
+            padding: 0.5rem 0.875rem;
+            font-size: 0.8rem;
+        }
+
+        .content-container {
+            padding: 1.5rem 1rem;
+        }
+
+        .empty-state {
+            padding: 3rem 1rem;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+        }
+    }
+</style>
+
+<div class="profile-wrapper">
+    <div class="profile-card">
+        <!-- Profile Header -->
+        <div class="profile-header {% if user_role == 'artist' %}artist{% endif %}">
+            <div class="profile-actions">
+                {% if user_role == 'artist' %}
+                    <a href="/create_concert" class="create-concert-btn">
+                        Create Concert
+                    </a>
+                {% endif %}
+                
+                {% if name %}
+                    <a href="/edit_profile" class="edit-profile-btn">
+                        Edit Profile
+                    </a>
+                {% else %}
+                    <a href="/edit_profile" class="edit-profile-btn complete">
+                        Complete Profile
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="profile-header-content">
+                <div class="profile-avatar">
+                    {% if user_role == 'artist' %}🎸{% else %}👤{% endif %}
+                </div>
+                <h1 class="profile-name">{{ name if name else 'New User' }}</h1>
+                
+                {% if user_role == 'artist' %}
+                    <div class="profile-badge">
+                        ✓ Verified Artist
+                    </div>
+                {% endif %}
+                
+                <div class="profile-details">
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-icon">📧</div>
+                        <div class="profile-detail-text">
+                            <strong>Email</strong>
+                            <span>{{ email if email else 'Not provided' }}</span>
+                        </div>
+                    </div>
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-icon">📱</div>
+                        <div class="profile-detail-text">
+                            <strong>Phone</strong>
+                            <span>{{ phone if phone else 'Not provided' }}</span>
+                        </div>
+                    </div>
+                    {% if user_role == 'artist' and artist_genre %}
+                        <div class="profile-detail-item">
+                            <div class="profile-detail-icon">🎵</div>
+                            <div class="profile-detail-text">
+                                <strong>Genre</strong>
+                                <span>{{ artist_genre }}</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Artist's Concerts Section (Only for Artists) -->
+        {% if user_role == 'artist' %}
+        <div class="content-container">
+            <h2 class="section-title artist-section">My Concerts</h2>
+
+            {% if artist_concerts and artist_concerts|length > 0 %}
+                <div class="concerts-grid">
+                    {% for concert in artist_concerts %}
+                    <div class="concert-card">
+                        <div class="concert-card-header">
+                            <h3 class="concert-card-title">{{ concert.title }}</h3>
+                            <p class="concert-card-date">
+                                📅 {{ concert.date_time }}
+                            </p>
+                        </div>
+                        <div class="concert-card-info">
+                            <span>🏛️ {{ concert.venue_name }}</span>
+                            <span>📍 {{ concert.location }}</span>
+                            <span>🎫 {{ concert.total_tickets }} tickets</span>
+                        </div>
+                        <div class="concert-card-actions">
+                            <a href="/edit_concert/{{ concert.concert_id }}" class="concert-btn edit">
+                                Edit
+                            </a>
+                            
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">🎤</div>
+                    <h3 class="empty-state-title">No concerts yet</h3>
+                    <p class="empty-state-text">Create your first concert and start selling tickets!</p>
+                    <a href="/create_concert" class="empty-state-btn artist">
+                        🎸 Create Your First Concert
+                    </a>
+                </div>
+            {% endif %}
+
+            <div class="section-divider"></div>
+        </div>
+        {% endif %}
+
+        <!-- Bookings Section (For Everyone) -->
+        <div class="content-container">
+            <h2 class="section-title">{% if user_role == 'artist' %}My Bookings{% else %}Your Bookings{% endif %}</h2>
+
+            {% if bookings and bookings|length > 0 %}
+                <div class="bookings-table-wrapper">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Concert</th>
+                                <th>Artist</th>
+                                <th>Venue</th>
+                                <th>Location</th>
+                                <th>Date</th>
+                                <th>Seat</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in bookings %}
+                            <tr>
+                                <td><strong>{{ b.concert_name }}</strong></td>
+                                <td>{{ b.artist_name }}</td>
+                                <td>{{ b.venue_name }}</td>
+                                <td>{{ b.venue_location }}</td>
+                                <td>{{ b.concert_date }}</td>
+                                <td>{{ b.row_no }}-{{ b.seat_no }}</td>
+                                <td><strong>₹{{ b.price }}</strong></td>
+                                <td>
+                                    <span class="status-badge {{ b.status|lower }}">
+                                        {{ b.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/ticket_details?booking_id={{ b.booking_id }}" class="view-btn">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">🎫</div>
+                    <h3 class="empty-state-title">No bookings yet</h3>
+                    <p class="empty-state-text">Start your journey by booking your first concert!</p>
+                    <a href="/index" class="empty-state-btn">
+                        Browse Concerts →
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
