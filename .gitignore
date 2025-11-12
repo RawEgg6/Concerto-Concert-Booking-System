@@ -20,6 +20,7 @@ instance/
 *.sqlite
 *.sqlite3
 test.sql
+triggers_and_routines.sql
 
 # Environment variables
 .env
