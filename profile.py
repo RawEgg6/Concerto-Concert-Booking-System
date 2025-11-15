@@ -78,7 +78,7 @@ def profile():
             JOIN Artists a ON c.artist_id = a.artist_id
             JOIN Venues v ON c.venue_id = v.venue_id
             WHERE b.user_id = %s 
-            ORDER BY c.date_time DESC
+            ORDER BY b.booking_time DESC
         """, (user_id,))
         bookings_data = cursor.fetchall()
         

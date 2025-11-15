@@ -18,7 +18,7 @@ def book_concert(concert_id):
     try:
         cursor = db.cursor()
         
-        # Get available tickets
+        # Get tickets
         cursor.execute("""
             SELECT t.ticket_id, s.row_no, s.seat_no, s.seat_type, t.price, t.status
             FROM Tickets t
@@ -161,3 +161,5 @@ def ticket_details():
                             price=ticket_details[7],
                             booking_status=ticket_details[8]
                     )
+
+
